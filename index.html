@@ -270,6 +270,27 @@
   .empty-hint{ font-family:var(--font-body); font-size:12px; color:#b0b2b7; }
   .footer-note{ color:#b0b2b7; }
 
+  /* ===== 마이페이지 / 확인 창 ===== */
+  .my-card{ background:var(--card-soft); border:1px solid #ececee; border-radius:14px; padding:12px 14px; margin-bottom:14px; }
+  .my-card .ml{ font-size:11px; color:var(--ink-dim); font-family:var(--font-mono); }
+  .my-card .mv{ font-family:var(--font-display); font-size:16px; margin-top:2px; word-break:break-all; }
+  .my-row{ display:flex; align-items:center; gap:12px; padding:12px 2px; border-bottom:1px solid var(--card-border); }
+  .my-row .mt{ flex:1; min-width:0; }
+  .my-row .mt b{ display:block; font-size:13.5px; }
+  .my-row .mt span{ display:block; font-size:11.5px; color:var(--ink-dim); margin-top:2px; line-height:1.4; }
+  .my-row button{ flex-shrink:0; padding:8px 14px; border:none; border-radius:10px; background:var(--card-soft); color:var(--ink); font-family:var(--font-display); font-size:13px; cursor:pointer; }
+  .my-row button.danger{ background:var(--accent); color:#fff; }
+  #confirmModal{ position:fixed; inset:0; z-index:9500; display:none; align-items:center; justify-content:center; background:rgba(30,30,35,.5); padding:16px; }
+  #confirmModal .box{ width:100%; max-width:340px; background:#fff; border-radius:18px; padding:20px; box-shadow:0 20px 50px rgba(0,0,0,.3); }
+  #confirmModal h2{ margin:0 0 8px; font-family:var(--font-display); font-size:16px; }
+  #confirmModal p{ margin:0 0 12px; font-size:13px; line-height:1.5; color:var(--ink); }
+  #confirmModal input{ width:100%; padding:9px 10px; border:1px solid var(--card-border); border-radius:10px; font-size:14px; font-family:inherit; margin-bottom:8px; }
+  #confirmModal .msg{ min-height:16px; font-size:12px; color:#b3261e; margin-bottom:6px; }
+  #confirmModal .btns{ display:flex; gap:8px; }
+  #confirmModal .btns button{ flex:1; padding:10px; border:none; border-radius:10px; font-family:var(--font-display); font-size:14px; cursor:pointer; background:var(--card-soft); color:var(--ink); }
+  #confirmModal .btns button.ok{ background:var(--accent); color:#fff; }
+  #confirmModal .btns button:disabled{ opacity:.5; cursor:default; }
+
 #authOverlay{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(20,18,16,.78);padding:16px}
 #authOverlay .box{width:100%;max-width:320px;background:#fff;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;font-family:inherit;color:#333}
 #authOverlay h2{margin:0 0 4px;font-size:16px;text-align:center}
@@ -279,7 +300,6 @@
 #authOverlay button.sub{background:#e4e0da;color:#333}
 #authOverlay .msg{min-height:16px;font-size:12px;color:#b3261e;text-align:center}
 #authOverlay .note{font-size:11px;color:#777;text-align:center}
-#logoutBtn{position:fixed;top:6px;right:6px;z-index:50;font-size:11px;padding:3px 8px;border:0;border-radius:6px;background:rgba(0,0,0,.45);color:#fff;cursor:pointer;display:none}
 </style>
 </head>
 <body>
@@ -1222,6 +1242,7 @@
     <button class="tabbtn" data-tab="pomo">뽀모도로</button>
     <button class="tabbtn" data-tab="log">기록</button>
     <button class="tabbtn" data-tab="setting">캐릭터 상태</button>
+    <button class="tabbtn" data-tab="mypage">마이페이지</button>
   </div>
 
   <div class="tabpanel active" id="tab-todo">
@@ -1291,9 +1312,17 @@
     <div class="empty-hint" id="logEmpty">아직 기록이 없어요</div>
   </div>
 
+  <div class="tabpanel" id="tab-mypage">
+    <div class="my-card"><div class="ml">아이디</div><div class="mv" id="myId"></div></div>
+    <div class="my-row" id="myLogoutRow"><div class="mt"><b>로그아웃</b><span>이 기기에서 로그아웃해요. 기록은 그대로 남아요.</span></div><button id="myLogout">로그아웃</button></div>
+    <div class="my-row"><div class="mt"><b>기록 초기화</b><span>할 일, 일정, 일기, 관계 수치, 기록, 뽀모도로 설정을 모두 지우고 처음 상태로 돌아가요. 계정은 유지돼요.</span></div><button class="danger" id="myReset">초기화</button></div>
+    <div class="my-row" id="myDeleteRow"><div class="mt"><b>회원 탈퇴</b><span>계정과 저장된 모든 기록을 삭제해요. 되돌릴 수 없어요.</span></div><button class="danger" id="myDelete">탈퇴</button></div>
+    <div class="empty-hint" id="myLocalNote" style="display:none">로그인 없이 이 브라우저에만 저장 중이라 로그아웃·탈퇴는 쓸 수 없어요</div>
+  </div>
+
   <div class="tabpanel" id="tab-setting">
     <div class="relbox">
-      <div class="reltitle">관계 수치 (−100 ~ +100)</div>
+      <div class="reltitle">관계 수치</div>
       <div class="relrow"><span class="rl">이디스 → 첼시</span><div class="relbar"><i id="relFillA"></i></div><b id="relNumA">0</b></div>
       <div class="relrow"><span class="rl">첼시 → 이디스</span><div class="relbar"><i id="relFillB"></i></div><b id="relNumB">0</b></div>
       <div class="relnote">이벤트가 일어나면 오르고 내려요</div>
@@ -1317,6 +1346,14 @@
   <div class="footer-note">모든 상태는 자동으로 저장돼요 · 캐릭터를 클릭해보세요</div>
 </div>
 
+<div id="confirmModal"><div class="box">
+  <h2 id="cfTitle"></h2>
+  <p id="cfBody"></p>
+  <input type="password" id="cfPw" placeholder="비밀번호" autocomplete="current-password" style="display:none">
+  <div class="msg" id="cfMsg"></div>
+  <div class="btns"><button id="cfCancel">취소</button><button class="ok" id="cfOk">확인</button></div>
+</div></div>
+
 <div id="awayModal"><div class="box">
   <h2>그동안 있었던 일</h2>
   <div class="sub2" id="awaySub"></div>
@@ -1333,7 +1370,6 @@
   <div class="row"><button id="authLoginBtn">로그인</button><button class="sub" id="authSignupBtn">가입</button></div>
   <div class="note">비밀번호를 잊으면 복구할 방법이 없어요</div>
 </div></div>
-<button id="logoutBtn">로그아웃</button>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
@@ -1363,6 +1399,7 @@
       return snap.exists ? snap.data().data : null;
     },
     async set(json){
+      if(window.__noSave) return;
       if(!auth){ try{ localStorage.setItem(LS, json); }catch(e){} return; }
       await db.collection('saves').doc(uid).set({ data: json, updated: firebase.firestore.FieldValue.serverTimestamp() });
     }
@@ -1392,16 +1429,29 @@
       else await auth.signInWithEmailAndPassword(f.email, f.pw);
     }catch(e){ msg(errText(e)); }
   }
+  // 마이페이지에서 쓰는 계정 기능
+  window.appAccount = {
+    mode: auth ? 'firebase' : 'local',
+    loginId(){ return auth && auth.currentUser ? String(auth.currentUser.email).replace(/@jagwan\.local$/, '') : ''; },
+    errText: errText,
+    async logout(){ window.__noSave = true; if(auth) await auth.signOut(); location.reload(); },
+    async deleteAccount(pw){
+      const u = auth.currentUser;
+      await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, pw));  // 비밀번호 재확인
+      await db.collection('saves').doc(u.uid).delete();
+      window.__noSave = true;
+      await u.delete();
+    }
+  };
   window.startAfterAuth = function(startApp){
     if(!auth){ startApp(); return; }   // Firebase 미설정: 로컬 저장으로 바로 시작
     $('authLoginBtn').addEventListener('click', ()=>doAuth(false));
     $('authSignupBtn').addEventListener('click', ()=>doAuth(true));
     $('authPw').addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(false); });
-    $('logoutBtn').addEventListener('click', async ()=>{ await auth.signOut(); location.reload(); });
     let started = false;
     auth.onAuthStateChanged(user=>{
       if(user){
-        uid = user.uid; $('authOverlay').style.display='none'; $('logoutBtn').style.display='block';
+        uid = user.uid; $('authOverlay').style.display='none';
         if(!started){ started = true; startApp(); }
       }else{
         $('authOverlay').style.display='flex';
@@ -1601,7 +1651,7 @@
     scheduleAmbient();
     scheduleMoodChange('A'); scheduleMoodChange('B');
     initTimeSystem();
-    renderRel(); renderLog(); initPomo();
+    renderRel(); renderLog(); initPomo(); initMyPage();
     checkAway();
     setInterval(()=>touchSeen(false), 5*60*1000);
   }
@@ -2037,6 +2087,64 @@
   document.getElementById('pomoReset').addEventListener('click', () => pomoSetMode(pomoMode));
   document.getElementById('pomoSkip').addEventListener('click', () => pomoSetMode(pomoNextMode()));
   ['pomoFocus','pomoBrk'].forEach(id => document.getElementById(id).addEventListener('change', pomoReadSettings));
+
+
+  // ===== 마이페이지: 로그아웃 / 기록 초기화 / 회원 탈퇴 =====
+  const cf = { modal:null, ok:null, onOk:null };
+  function openConfirm(opt){
+    const g = id => document.getElementById(id);
+    g('cfTitle').textContent = opt.title; g('cfBody').textContent = opt.body;
+    g('cfPw').style.display = opt.needPw ? 'block' : 'none'; g('cfPw').value = '';
+    g('cfMsg').textContent = ''; g('cfOk').textContent = opt.okText || '확인';
+    g('cfOk').disabled = false; g('cfCancel').disabled = false;
+    cf.onOk = opt.onOk;
+    g('confirmModal').style.display = 'flex';
+    if(opt.needPw) g('cfPw').focus();
+  }
+  function closeConfirm(){ document.getElementById('confirmModal').style.display = 'none'; }
+  document.getElementById('cfCancel').addEventListener('click', closeConfirm);
+  document.getElementById('cfOk').addEventListener('click', async () => {
+    const ok = document.getElementById('cfOk'), cancel = document.getElementById('cfCancel'), msg = document.getElementById('cfMsg');
+    ok.disabled = true; cancel.disabled = true; msg.textContent = '';
+    try{
+      await cf.onOk(document.getElementById('cfPw').value);
+    }catch(e){
+      msg.textContent = (window.appAccount && window.appAccount.errText) ? window.appAccount.errText(e) : String(e.message || e);
+      ok.disabled = false; cancel.disabled = false;
+    }
+  });
+
+  async function resetAllData(){
+    clearTimeout(saveTimer);
+    state = JSON.parse(JSON.stringify(defaultState));
+    state.lastSeen = Date.now();
+    await window.appStorage.set(JSON.stringify(state));
+    location.reload();
+  }
+  function initMyPage(){
+    const acc = window.appAccount, local = !acc || acc.mode === 'local';
+    document.getElementById('myId').textContent = local ? '로그인 없음' : acc.loginId();
+    document.getElementById('myLogoutRow').style.display = local ? 'none' : 'flex';
+    document.getElementById('myDeleteRow').style.display = local ? 'none' : 'flex';
+    document.getElementById('myLocalNote').style.display = local ? 'block' : 'none';
+  }
+  document.getElementById('myLogout').addEventListener('click', () => window.appAccount.logout());
+  document.getElementById('myReset').addEventListener('click', () => openConfirm({
+    title: '기록 초기화', okText: '초기화',
+    body: '할 일, 일정, 일기, 관계 수치, 기록, 뽀모도로 설정이 모두 삭제되고 처음 상태로 돌아가요. 되돌릴 수 없어요.',
+    onOk: resetAllData
+  }));
+  document.getElementById('myDelete').addEventListener('click', () => openConfirm({
+    title: '회원 탈퇴', okText: '탈퇴', needPw: true,
+    body: '계정과 저장된 모든 기록이 삭제되고 되돌릴 수 없어요. 계속하려면 비밀번호를 입력해 주세요.',
+    onOk: async (pw) => {
+      if(!pw) throw new Error('비밀번호를 입력해 주세요');
+      await window.appAccount.deleteAccount(pw);
+      document.getElementById('cfBody').textContent = '탈퇴가 완료됐어요.';
+      document.getElementById('cfPw').style.display = 'none';
+      setTimeout(() => location.reload(), 1200);
+    }
+  }));
 
   function initTimeSystem(){
     applyTimeVisuals();
