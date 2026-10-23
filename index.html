@@ -1969,7 +1969,7 @@
     document.getElementById('pomoMain').textContent = pomoRunning ? '일시정지' : (untouched ? pomoNames[pomoMode] + ' 시작' : '계속');
     document.getElementById('pomoCount').textContent = '오늘 완료한 집중: ' + pomoDoneToday() + '회';
     ['pomoFocus','pomoBrk'].forEach(id => document.getElementById(id).disabled = pomoRunning);
-    document.title = pomoRunning ? (txt + ' · ' + pomoNames[pomoMode]) : '이디스 & 첼시';
+    document.title = pomoRunning ? (txt + ' · ' + pomoNames[pomoMode]) : 'CHASE to do list';
   }
   function pomoSetMode(mode){
     pomoMode = mode; pomoRunning = false; pomoRemain = pomoDurationMs(mode);
