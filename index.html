@@ -272,6 +272,7 @@
   .diary-hint, .pomo-count, .relnote, .log-entry .lt, .log-entry .lr, #relToast, #awayModal .sum{ font-family:var(--font-body); font-size:12px; }
   .log-entry .lt{ font-size:10px; }
   .todo-item .date{ font-family:var(--font-body); font-size:11px; }
+  .diary-head{ font-family:var(--font-body); font-size:12px; color:#b0b2b7; }
   .timechip, .titlebar .sub{ font-family:'Dancing Peoples','Jua',var(--font-body),sans-serif; font-weight:800; font-size:14px; letter-spacing:.02em; color:#b0b2b7; }
   .diary-hint, .pomo-count, .relnote, .log-entry .lt, .log-entry .lr{ color:#b0b2b7; }
   .footer-note{ color:#b0b2b7; }
@@ -1320,7 +1321,7 @@
   <div class="tabpanel" id="tab-diary">
     <div class="todo-add">
       <input type="date" id="diaryDate">
-      <div class="diary-hint">하루에 한 줄, 같은 날은 덮어써요</div>
+      <div class="diary-hint">같은 날 여러 번 써도 모두 남아요</div>
     </div>
     <div class="diary-moods" id="diaryMoods"></div>
     <div class="todo-add">
@@ -1390,8 +1391,7 @@
 <button id="musicFab" type="button" title="음악" aria-label="음악"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></button>
 <div id="musicPanel">
   <div class="mp-head">
-    <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>MUSIC<span class="sp"></span>
-    <button class="mp-ic" id="mpListBtn" type="button" title="재생목록"><svg viewBox="0 0 24 24"><path d="M3 6h13M3 12h13M3 18h7"/><circle cx="18" cy="17" r="2.5"/><path d="M20.5 17V9"/></svg></button>
+    <svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><span class="sp"></span>
     <button class="mp-ic" id="mpClose" type="button" title="닫기"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
   <div id="mpMain">
@@ -1404,11 +1404,7 @@
         <button class="mp-ic" id="mpNext" type="button" title="다음"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5l10 7-10 7z"/></svg></button>
       </div>
     </div>
-    <div class="mp-row">재생 순서<div class="seg"><button type="button" id="mpSeq" class="sel">순서대로</button><button type="button" id="mpRand">무작위</button></div></div>
-    <div class="mp-row">볼륨<input type="range" id="mpVol" min="0" max="100" value="70"><span id="mpVolV">70%</span></div>
     <button class="mp-btn" id="mpToAdd" type="button">＋ 음악 추가</button>
-  </div>
-  <div id="mpListView" style="display:none">
     <div class="mp-sub">재생목록</div>
     <ul class="mp-list" id="mpList"></ul>
   </div>
@@ -2212,14 +2208,12 @@
       if(/^[A-Za-z0-9_-]{11}$/.test(u)) return u;
       return null;
     }
-    function view(v){ ['mpMain','mpListView','mpAddView'].forEach(k=>$m(k).style.display = (k===v?'block':'none')); $m('mpListBtn').classList.toggle('on', v==='mpListView'); }
+    function view(v){ ['mpMain','mpAddView'].forEach(k=>$m(k).style.display = (k===v?'block':'none')); }
     function curTitle(){ const t=M.list[M.idx]; return t ? t.title : '재생 중인 음악이 없습니다.'; }
     function renderNow(){
       $m('mpTitle').textContent = curTitle();
       $m('mpPlayIc').innerHTML = playing ? '<path d="M7 5v14M17 5v14"/>' : '<path d="M7 4l13 8-13 8z"/>';
       fab.classList.toggle('playing', playing);
-      $m('mpSeq').classList.toggle('sel', M.order==='seq'); $m('mpRand').classList.toggle('sel', M.order==='rand');
-      $m('mpVol').value = M.vol; $m('mpVolV').textContent = M.vol+'%';
     }
     function renderList(){
       const ul=$m('mpList'); ul.innerHTML='';
@@ -2245,7 +2239,7 @@
       pendingPlay = true; if(ytLoading) return; ytLoading = true;
       window.onYouTubeIframeAPIReady = function(){
         yt = new YT.Player('ytPlayer', { height:'2', width:'2', playerVars:{ playsinline:1, controls:0 }, events:{
-          onReady(){ ytReady=true; try{ yt.setVolume(M.vol); }catch(e){} if(pendingPlay){ pendingPlay=false; cb(); } },
+          onReady(){ ytReady=true; try{ yt.setVolume(100); }catch(e){} if(pendingPlay){ pendingPlay=false; cb(); } },
           onStateChange(e){
             if(e.data===1){ playing=true; fixTitle(); }
             else if(e.data===2){ playing=false; }
@@ -2265,13 +2259,12 @@
     function playIndex(i){
       if(i<0 || i>=M.list.length) return;
       M.idx=i; scheduleSave(); renderNow(); renderList();
-      loadApi(()=>{ try{ yt.setVolume(M.vol); yt.loadVideoById(M.list[M.idx].id); }catch(e){} });
+      loadApi(()=>{ try{ yt.setVolume(100); yt.loadVideoById(M.list[M.idx].id); }catch(e){} });
     }
     function step(dir, auto){
       const n=M.list.length; if(!n) return;
       let i;
-      if(M.order==='rand' && n>1){ do{ i=Math.floor(Math.random()*n); }while(i===M.idx); }
-      else i=((M.idx<0?0:M.idx)+dir+n)%n;
+      i=((M.idx<0?0:M.idx)+dir+n)%n;
       if(auto && n===1){ try{ yt.seekTo(0); yt.playVideo(); }catch(e){} return; }
       playIndex(i);
     }
@@ -2303,19 +2296,15 @@
       scheduleSave(); $m('mpUrl').value=''; $m('mpPrev2').textContent=''; cand=null;
       $m('mpAddBtn').disabled=true; $m('mpAddPlay').disabled=true;
       renderList();
-      if(playNow){ playIndex(i); view('mpMain'); } else view('mpListView');
+      if(playNow){ playIndex(i); view('mpMain'); } else view('mpMain');
     }
     fab.onclick=()=>{ panel.classList.toggle('open'); if(panel.classList.contains('open')){ renderNow(); renderList(); } };
     $m('mpClose').onclick=()=>panel.classList.remove('open');
-    $m('mpListBtn').onclick=()=>view($m('mpListView').style.display==='none'?'mpListView':'mpMain');
     $m('mpToAdd').onclick=()=>view('mpAddView');
     $m('mpBack').onclick=()=>view('mpMain');
     $m('mpPlay').onclick=togglePlay;
     $m('mpPrev').onclick=()=>step(-1,false);
     $m('mpNext').onclick=()=>step(1,false);
-    $m('mpSeq').onclick=()=>{ M.order='seq'; renderNow(); scheduleSave(); };
-    $m('mpRand').onclick=()=>{ M.order='rand'; renderNow(); scheduleSave(); };
-    $m('mpVol').oninput=e=>{ M.vol=+e.target.value; $m('mpVolV').textContent=M.vol+'%'; if(ytReady) try{ yt.setVolume(M.vol); }catch(_){} scheduleSave(); };
     $m('mpUrl').addEventListener('input', onUrl);
     $m('mpAddBtn').onclick=()=>addCand(false);
     $m('mpAddPlay').onclick=()=>addCand(true);
@@ -3053,7 +3042,7 @@
     });
   }
 
-  function diaryEntryCard(date, entry){
+  function diaryEntryCard(date, entry, idx){
     const m = diaryMoods[entry.mood] || diaryMoods.soso;
     const card = document.createElement('div');
     card.className = 'diary-entry';
@@ -3063,7 +3052,7 @@
     const label = document.createElement('span');
     label.textContent = formatDateLabel(date) + ' ' + m.emoji + ' ' + m.label;
     const sp = document.createElement('span'); sp.className = 'sp';
-    const editBtn = document.createElement('button'); editBtn.textContent = '수정';
+    const editBtn = document.createElement('button'); editBtn.textContent = 'edit';
     const delBtn = document.createElement('button'); delBtn.textContent = '×';
     head.append(label, sp, editBtn, delBtn);
 
@@ -3083,23 +3072,28 @@
     const lineB = document.createElement('span'); lineB.textContent = entry.replyB || '';
     replyB.append(nameB, lineB);
 
-    editBtn.addEventListener('click', ()=> editDiary(date));
-    delBtn.addEventListener('click', ()=> deleteDiary(date));
+    editBtn.addEventListener('click', ()=> editDiary(date, idx||0));
+    delBtn.addEventListener('click', ()=> deleteDiary(date, idx||0));
     card.append(head, text, replyA, replyB);
     return card;
   }
 
+  // 같은 날 여러 번 쓰면 모두 남는다: state.diary[날짜] = 최신 글, .older = 이전 글들(최신순)
+  function diaryEntriesOf(date){
+    const e = state.diary && state.diary[date];
+    return e ? [e].concat(e.older || []) : [];
+  }
+  let diaryEditTarget = null;
   function renderDiary(){
     if(!state.diary) state.diary = {};
-    const dates = Object.keys(state.diary).sort().reverse().slice(0, 30);
+    const dates = Object.keys(state.diary).sort().reverse();
     el.diaryList.innerHTML = '';
     el.diaryEmpty.style.display = dates.length ? 'none' : 'block';
-    dates.forEach(d => el.diaryList.appendChild(diaryEntryCard(d, state.diary[d])));
+    dates.forEach(d => diaryEntriesOf(d).forEach((e,i) => el.diaryList.appendChild(diaryEntryCard(d, e, i))));
   }
   function renderCalDiary(){
     el.calDiary.innerHTML = '';
-    const entry = state.diary && state.diary[calSelectedDate];
-    if(entry) el.calDiary.appendChild(diaryEntryCard(calSelectedDate, entry));
+    diaryEntriesOf(calSelectedDate).forEach((e,i) => el.calDiary.appendChild(diaryEntryCard(calSelectedDate, e, i)));
   }
   function refreshDiaryViews(){
     renderDiary();
@@ -3132,16 +3126,26 @@
       replyA: diaryReplyFor('A', diaryMoodSel, text),
       replyB: diaryReplyFor('B', diaryMoodSel, text)
     };
-    state.diary[date] = entry;
+    const cur = state.diary[date];
+    if(diaryEditTarget && diaryEditTarget.date===date && cur){
+      const i = diaryEditTarget.idx;   // 수정: 해당 글 자리에 덮어쓰기 (다른 글은 그대로)
+      if(i===0){ entry.older = cur.older || []; state.diary[date] = entry; }
+      else if(cur.older && cur.older[i-1]){ cur.older[i-1] = entry; }
+    }else{
+      if(cur){ const older = cur.older || []; delete cur.older; entry.older = [cur].concat(older); }
+      state.diary[date] = entry;
+    }
+    diaryEditTarget = null;
     relChange(1, 1, {scale:REL_LIVE_SCALE});
     el.diaryInput.value = '';
     refreshDiaryViews();
     scheduleSave();
     diaryReplyScene(entry);
   }
-  function editDiary(date){
-    const entry = state.diary && state.diary[date];
+  function editDiary(date, idx){
+    const entry = diaryEntriesOf(date)[idx||0];
     if(!entry) return;
+    diaryEditTarget = { date:date, idx:idx||0 };
     el.diaryDate.value = date;
     diaryMoodSel = entry.mood in diaryMoods ? entry.mood : 'soso';
     el.diaryInput.value = entry.text;
@@ -3150,9 +3154,17 @@
     if(tabBtn) tabBtn.click();
     el.diaryInput.focus();
   }
-  function deleteDiary(date){
-    if(!state.diary) return;
-    delete state.diary[date];
+  function deleteDiary(date, idx){
+    const cur = state.diary && state.diary[date];
+    if(!cur) return;
+    const older = cur.older || [];
+    if(idx===0){
+      if(older.length){ const nx = older[0]; nx.older = older.slice(1); state.diary[date] = nx; }
+      else delete state.diary[date];
+    }else{
+      older.splice(idx-1,1); cur.older = older;
+    }
+    diaryEditTarget = null;
     refreshDiaryViews();
     scheduleSave();
   }
