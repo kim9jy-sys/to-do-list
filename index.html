@@ -321,6 +321,10 @@
   .mp-ic:hover{ background:var(--accent-soft); color:var(--accent); }
   .mp-ic.on{ background:var(--accent); color:#fff; }
   .mp-now{ background:var(--card-soft); border-radius:14px; padding:14px; margin-bottom:12px; }
+  .mp-now{ position:relative; }
+  #mpRep{ position:absolute; right:14px; bottom:14px; width:32px; height:32px; }
+  #mpRep .n{ display:none; position:absolute; inset:0; align-items:center; justify-content:center; font-size:8px; font-weight:800; line-height:1; }
+  #mpRep.one .n{ display:flex; }
   .mp-now .lbl{ font-size:11px; color:var(--ink-dim); margin-bottom:4px; }
   .mp-now .ttl{ font-size:14px; line-height:1.4; word-break:break-all; margin-bottom:10px; }
   .mp-ctl{ display:flex; gap:8px; justify-content:center; }
@@ -343,6 +347,22 @@
   .mp-empty{ font-size:12px; color:var(--ink-dim); padding:8px 2px; }
   .mp-sub{ font-size:12px; color:var(--ink-dim); margin:10px 0 6px; }
   #ytHost{ position:fixed; width:2px; height:2px; left:-10px; bottom:0; opacity:0; pointer-events:none; overflow:hidden; }
+  /* ── 스티커 ── */
+  #stickerLayer{ position:absolute; inset:0; z-index:40; pointer-events:none; overflow:hidden; border-radius:inherit; }
+  .stk{ position:absolute; line-height:0; }
+  .stk img{ width:100%; height:auto; display:block; user-select:none; -webkit-user-drag:none; pointer-events:none; }
+  #stickerLayer.edit .stk{ pointer-events:auto; cursor:move; outline:1.5px dashed var(--accent); outline-offset:2px; touch-action:none; }
+  .stk .sx, .stk .sr{ display:none; position:absolute; border:none; padding:0; }
+  #stickerLayer.edit .stk .sx, #stickerLayer.edit .stk .sr{ display:block; }
+  .stk .sx{ top:-9px; right:-9px; width:20px; height:20px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; line-height:20px; text-align:center; cursor:pointer; }
+  .stk .sr{ right:-8px; bottom:-8px; width:16px; height:16px; border-radius:4px; background:#fff; border:2px solid var(--accent); cursor:nwse-resize; touch-action:none; }
+  #stkFab{ position:fixed; left:66px; bottom:16px; z-index:60; width:42px; height:42px; border-radius:50%; border:1px solid var(--card-border); background:#fff; color:var(--ink-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 14px rgba(30,30,35,.12); padding:0; }
+  #stkFab.on{ color:var(--accent); border-color:var(--accent); }
+  #stkFab svg{ width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  #stkPanel{ position:fixed; left:66px; bottom:68px; z-index:61; width:min(260px, calc(100vw - 32px)); background:#fff; border:1px solid var(--card-border); border-radius:18px; padding:14px; box-shadow:0 18px 44px rgba(30,30,35,.22); display:none; }
+  #stkPanel.open{ display:block; }
+  #stkPanel .mp-btn:first-of-type{ margin-top:0; }
+  #stkMsg{ font-size:12px; color:#b0b2b7; margin-top:10px; line-height:1.5; }
 </style>
 </head>
 <body>
@@ -1404,6 +1424,7 @@
         <button class="mp-ic on" id="mpPlay" type="button" title="재생/일시정지"><svg viewBox="0 0 24 24" id="mpPlayIc"><path d="M7 4l13 8-13 8z"/></svg></button>
         <button class="mp-ic" id="mpNext" type="button" title="다음"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5l10 7-10 7z"/></svg></button>
       </div>
+      <button class="mp-ic" id="mpRep" type="button" title="반복: 끔"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span class="n">1</span></button>
     </div>
     <button class="mp-btn" id="mpToAdd" type="button">＋ 음악 추가</button>
     <div class="mp-sub">재생목록</div>
@@ -1417,6 +1438,13 @@
     <button class="mp-btn pri" id="mpAddPlay" type="button" disabled>▶ 바로 재생</button>
     <button class="mp-btn" id="mpBack" type="button">← 돌아가기</button>
   </div>
+</div>
+<button id="stkFab" type="button" title="스티커" aria-label="스티커"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="9" cy="9" r="1.6"/><path d="M21 15l-5-5L5 21"/></svg></button>
+<div id="stkPanel">
+  <button class="mp-btn" id="stkAdd" type="button">＋ 사진 추가 (<span id="stkCnt">0</span>/5)</button>
+  <button class="mp-btn" id="stkEdit" type="button">편집 모드 켜기</button>
+  <div id="stkMsg">편집 모드에서 스티커를 끌어 옮기고, 오른쪽 아래 모서리로 크기를 바꿀 수 있어요.</div>
+  <input type="file" id="stkFile" accept="image/*" style="display:none">
 </div>
 <div id="confirmModal"><div class="box">
   <h2 id="cfTitle"></h2>
@@ -1623,6 +1651,7 @@
     events:[],
     pomo:{ focus:25, brk:5, doneDate:'', doneCount:0 },
     music:{ list:[], idx:-1, order:'seq', vol:70 },
+    stickers:[],
     log:[],
     lastSeen:0
   };
@@ -1724,7 +1753,7 @@
     scheduleAmbient();
     scheduleMoodChange('A'); scheduleMoodChange('B');
     initTimeSystem();
-    renderRel(); renderLog(); initPomo(); initMyPage(); initMusic();
+    renderRel(); renderLog(); initPomo(); initMyPage(); initMusic(); initStickers();
     checkAway();
     setInterval(()=>touchSeen(false), 5*60*1000);
   }
@@ -2215,6 +2244,9 @@
       $m('mpTitle').textContent = curTitle();
       $m('mpPlayIc').innerHTML = playing ? '<path d="M7 5v14M17 5v14"/>' : '<path d="M7 4l13 8-13 8z"/>';
       fab.classList.toggle('playing', playing);
+      const rp=M.repeat||'off', rb=$m('mpRep');
+      rb.classList.toggle('on', rp!=='off'); rb.classList.toggle('one', rp==='one');
+      rb.title = rp==='one' ? '반복: 한 곡' : rp==='all' ? '반복: 재생목록 전체' : '반복: 끔';
     }
     function renderList(){
       const ul=$m('mpList'); ul.innerHTML='';
@@ -2244,7 +2276,7 @@
           onStateChange(e){
             if(e.data===1){ playing=true; fixTitle(); }
             else if(e.data===2){ playing=false; }
-            else if(e.data===0){ playing=false; step(1, true); }
+            else if(e.data===0){ playing=false; onEnded(); }
             renderNow(); renderList();
           },
           onError(){ playing=false; step(1, true); }
@@ -2268,6 +2300,12 @@
       i=((M.idx<0?0:M.idx)+dir+n)%n;
       if(auto && n===1){ try{ yt.seekTo(0); yt.playVideo(); }catch(e){} return; }
       playIndex(i);
+    }
+    function onEnded(){
+      const rp = M.repeat || 'off', n = M.list.length;
+      if(rp==='one'){ try{ yt.seekTo(0); yt.playVideo(); }catch(e){} return; }
+      if(rp==='off' && M.idx >= n-1){ renderNow(); renderList(); return; }   // 마지막 곡이면 멈춤
+      step(1, true);
     }
     function togglePlay(){
       if(!M.list.length){ view('mpAddView'); return; }
@@ -2304,12 +2342,102 @@
     $m('mpToAdd').onclick=()=>view('mpAddView');
     $m('mpBack').onclick=()=>view('mpMain');
     $m('mpPlay').onclick=togglePlay;
+    $m('mpRep').onclick=()=>{ const o=['off','all','one']; M.repeat=o[(o.indexOf(M.repeat||'off')+1)%3]; renderNow(); scheduleSave(); };
     $m('mpPrev').onclick=()=>step(-1,false);
     $m('mpNext').onclick=()=>step(1,false);
     $m('mpUrl').addEventListener('input', onUrl);
     $m('mpAddBtn').onclick=()=>addCand(false);
     $m('mpAddPlay').onclick=()=>addCand(true);
     renderNow(); renderList();
+  }
+
+
+  /* ── 스티커 (사진 → 축소·압축 → 앱 위에 붙이기, 최대 5개) ── */
+  function initStickers(){
+    if(!Array.isArray(state.stickers)) state.stickers = [];
+    const MAX=5, SIDE=256;
+    const $s = id => document.getElementById(id);
+    const app = document.querySelector('.app');
+    let layer = $s('stickerLayer');
+    if(!layer){ layer = document.createElement('div'); layer.id='stickerLayer'; app.appendChild(layer); }
+    let editing=false;
+    const say2 = t => { $s('stkMsg').textContent = t; };
+    function clampPos(st){
+      st.w = Math.max(6, Math.min(60, st.w));
+      st.x = Math.max(0, Math.min(100-st.w, st.x));
+      st.y = Math.max(0, Math.min(96, st.y));
+    }
+    function render(){
+      layer.innerHTML='';
+      layer.classList.toggle('edit', editing);
+      state.stickers.forEach(st=>{
+        const d=document.createElement('div'); d.className='stk';
+        d.style.left=st.x+'%'; d.style.top=st.y+'%'; d.style.width=st.w+'%';
+        const im=document.createElement('img'); im.src=st.src; im.alt='';
+        const x=document.createElement('button'); x.className='sx'; x.type='button'; x.textContent='×'; x.title='삭제';
+        const r=document.createElement('span'); r.className='sr';
+        d.append(im,x,r); layer.appendChild(d);
+        x.addEventListener('pointerdown', e=>e.stopPropagation());
+        x.addEventListener('click', e=>{ e.stopPropagation(); state.stickers = state.stickers.filter(q=>q!==st); render(); updateUi(); scheduleSave(); });
+        // 이동
+        d.addEventListener('pointerdown', e=>{
+          if(!editing || e.target===r || e.target===x) return;
+          e.preventDefault(); d.setPointerCapture(e.pointerId);
+          const ar=app.getBoundingClientRect(); const sx=e.clientX, sy=e.clientY, ox=st.x, oy=st.y;
+          const mv=ev=>{ st.x=ox+(ev.clientX-sx)/ar.width*100; st.y=oy+(ev.clientY-sy)/ar.height*100; clampPos(st); d.style.left=st.x+'%'; d.style.top=st.y+'%'; };
+          const up=()=>{ d.removeEventListener('pointermove',mv); d.removeEventListener('pointerup',up); d.removeEventListener('pointercancel',up); scheduleSave(); };
+          d.addEventListener('pointermove',mv); d.addEventListener('pointerup',up); d.addEventListener('pointercancel',up);
+        });
+        // 크기
+        r.addEventListener('pointerdown', e=>{
+          e.preventDefault(); e.stopPropagation(); r.setPointerCapture(e.pointerId);
+          const ar=app.getBoundingClientRect(); const sx=e.clientX, ow=st.w;
+          const mv=ev=>{ st.w=ow+(ev.clientX-sx)/ar.width*100; clampPos(st); d.style.width=st.w+'%'; d.style.left=st.x+'%'; };
+          const up=()=>{ r.removeEventListener('pointermove',mv); r.removeEventListener('pointerup',up); r.removeEventListener('pointercancel',up); scheduleSave(); };
+          r.addEventListener('pointermove',mv); r.addEventListener('pointerup',up); r.addEventListener('pointercancel',up);
+        });
+      });
+    }
+    function updateUi(){
+      $s('stkCnt').textContent = state.stickers.length;
+      $s('stkEdit').textContent = editing ? '편집 모드 끄기' : '편집 모드 켜기';
+      $s('stkFab').classList.toggle('on', editing);
+    }
+    function shrink(file){
+      return new Promise((res,rej)=>{
+        const url=URL.createObjectURL(file); const im=new Image();
+        im.onload=()=>{
+          const k=Math.min(1, SIDE/Math.max(im.naturalWidth, im.naturalHeight));
+          const w=Math.max(1,Math.round(im.naturalWidth*k)), h=Math.max(1,Math.round(im.naturalHeight*k));
+          const c=document.createElement('canvas'); c.width=w; c.height=h;
+          c.getContext('2d').drawImage(im,0,0,w,h); URL.revokeObjectURL(url);
+          let out=c.toDataURL('image/webp',0.8);
+          if(!out.startsWith('data:image/webp')) out=c.toDataURL('image/png');   // webp 미지원 브라우저
+          res({src:out, ratio:h/w});
+        };
+        im.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error('load')); };
+        im.src=url;
+      });
+    }
+    $s('stkFab').onclick=()=>$s('stkPanel').classList.toggle('open');
+    $s('stkAdd').onclick=()=>{
+      if(state.stickers.length>=MAX){ say2('스티커는 최대 '+MAX+'개까지 붙일 수 있어요. 하나를 지운 뒤 추가해 주세요.'); return; }
+      $s('stkFile').click();
+    };
+    $s('stkFile').onchange=async e=>{
+      const f=e.target.files && e.target.files[0]; e.target.value='';
+      if(!f) return;
+      if(state.stickers.length>=MAX){ say2('스티커는 최대 '+MAX+'개까지 붙일 수 있어요.'); return; }
+      if(!/^image\//.test(f.type)){ say2('이미지 파일만 불러올 수 있어요.'); return; }
+      try{
+        const r=await shrink(f);
+        state.stickers.push({ id:Date.now()+'-'+Math.floor(Math.random()*1e6), src:r.src, x:35, y:30, w:16 });
+        editing=true; render(); updateUi(); scheduleSave();
+        say2('붙였어요. 끌어서 옮기고, 편집 모드를 끄면 고정돼요.');
+      }catch(err){ say2('사진을 불러오지 못했어요.'); }
+    };
+    $s('stkEdit').onclick=()=>{ editing=!editing; render(); updateUi(); };
+    render(); updateUi();
   }
 
   function initMyPage(){
