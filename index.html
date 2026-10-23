@@ -348,7 +348,7 @@
   .mp-sub{ font-size:12px; color:var(--ink-dim); margin:10px 0 6px; }
   #ytHost{ position:fixed; width:2px; height:2px; left:-10px; bottom:0; opacity:0; pointer-events:none; overflow:hidden; }
   /* ── 스티커 ── */
-  #stickerLayer{ position:absolute; inset:0; z-index:40; pointer-events:none; overflow:hidden; border-radius:inherit; }
+  #stickerLayer{ position:fixed; inset:0; z-index:40; pointer-events:none; overflow:hidden; }
   .stk{ position:absolute; line-height:0; }
   .stk img{ width:100%; height:auto; display:block; user-select:none; -webkit-user-drag:none; pointer-events:none; }
   #stickerLayer.edit .stk{ pointer-events:auto; cursor:move; outline:1.5px dashed var(--accent); outline-offset:2px; touch-action:none; }
@@ -2359,24 +2359,33 @@
     const $s = id => document.getElementById(id);
     const app = document.querySelector('.app');
     let layer = $s('stickerLayer');
-    if(!layer){ layer = document.createElement('div'); layer.id='stickerLayer'; app.appendChild(layer); }
+    if(!layer){ layer = document.createElement('div'); layer.id='stickerLayer'; document.body.appendChild(layer); }
     let editing=false;
     const say2 = t => { $s('stkMsg').textContent = t; };
-    function clampPos(st){
-      st.w = Math.max(6, Math.min(60, st.w));
-      st.x = Math.max(0, Math.min(100-st.w, st.x));
-      st.y = Math.max(0, Math.min(96, st.y));
+    // 위치는 앱 크기 기준 %(앱 밖도 가능), 화면(브라우저 창) 밖으로만 나가지 않게 제한
+    function clampPos(st){ st.w = Math.max(6, Math.min(60, st.w)); }
+    function place(d, st, commit){
+      const ar=app.getBoundingClientRect(), vw=document.documentElement.clientWidth, vh=document.documentElement.clientHeight;
+      d.style.width = (st.w/100*ar.width)+'px';
+      const w=d.offsetWidth, h=d.offsetHeight;
+      let L = ar.left + st.x/100*ar.width, T = ar.top + st.y/100*ar.height;
+      L = Math.max(0, Math.min(vw-w, L)); T = Math.max(0, Math.min(vh-h, T));
+      d.style.left=L+'px'; d.style.top=T+'px';
+      if(commit){ st.x=(L-ar.left)/ar.width*100; st.y=(T-ar.top)/ar.height*100; }
     }
+    const els=new Map();
+    function placeAll(){ els.forEach((d,st)=>place(d,st)); }
     function render(){
-      layer.innerHTML='';
+      layer.innerHTML=''; els.clear();
       layer.classList.toggle('edit', editing);
       state.stickers.forEach(st=>{
         const d=document.createElement('div'); d.className='stk';
-        d.style.left=st.x+'%'; d.style.top=st.y+'%'; d.style.width=st.w+'%';
         const im=document.createElement('img'); im.src=st.src; im.alt='';
         const x=document.createElement('button'); x.className='sx'; x.type='button'; x.textContent='×'; x.title='삭제';
         const r=document.createElement('span'); r.className='sr';
-        d.append(im,x,r); layer.appendChild(d);
+        d.append(im,x,r); layer.appendChild(d); els.set(st,d);
+        im.addEventListener('load',()=>place(d,st));
+        place(d,st);
         x.addEventListener('pointerdown', e=>e.stopPropagation());
         x.addEventListener('click', e=>{ e.stopPropagation(); state.stickers = state.stickers.filter(q=>q!==st); render(); updateUi(); scheduleSave(); });
         // 이동
@@ -2384,7 +2393,7 @@
           if(!editing || e.target===r || e.target===x) return;
           e.preventDefault(); d.setPointerCapture(e.pointerId);
           const ar=app.getBoundingClientRect(); const sx=e.clientX, sy=e.clientY, ox=st.x, oy=st.y;
-          const mv=ev=>{ st.x=ox+(ev.clientX-sx)/ar.width*100; st.y=oy+(ev.clientY-sy)/ar.height*100; clampPos(st); d.style.left=st.x+'%'; d.style.top=st.y+'%'; };
+          const mv=ev=>{ st.x=ox+(ev.clientX-sx)/ar.width*100; st.y=oy+(ev.clientY-sy)/ar.height*100; place(d,st,true); };
           const up=()=>{ d.removeEventListener('pointermove',mv); d.removeEventListener('pointerup',up); d.removeEventListener('pointercancel',up); scheduleSave(); };
           d.addEventListener('pointermove',mv); d.addEventListener('pointerup',up); d.addEventListener('pointercancel',up);
         });
@@ -2392,12 +2401,15 @@
         r.addEventListener('pointerdown', e=>{
           e.preventDefault(); e.stopPropagation(); r.setPointerCapture(e.pointerId);
           const ar=app.getBoundingClientRect(); const sx=e.clientX, ow=st.w;
-          const mv=ev=>{ st.w=ow+(ev.clientX-sx)/ar.width*100; clampPos(st); d.style.width=st.w+'%'; d.style.left=st.x+'%'; };
+          const mv=ev=>{ st.w=ow+(ev.clientX-sx)/ar.width*100; clampPos(st); place(d,st,true); };
           const up=()=>{ r.removeEventListener('pointermove',mv); r.removeEventListener('pointerup',up); r.removeEventListener('pointercancel',up); scheduleSave(); };
           r.addEventListener('pointermove',mv); r.addEventListener('pointerup',up); r.addEventListener('pointercancel',up);
         });
       });
     }
+    window.addEventListener('resize', placeAll);
+    window.addEventListener('scroll', placeAll, {passive:true});
+    if(window.ResizeObserver) new ResizeObserver(placeAll).observe(app);
     function updateUi(){
       $s('stkCnt').textContent = state.stickers.length;
       $s('stkEdit').textContent = editing ? '편집 모드 끄기' : '편집 모드 켜기';
