@@ -1591,54 +1591,54 @@
 
   const edithDialogue = {
     good:{
-      idle:['오늘따라 기분이 좋아요!','콧노래가 절로 나와요~'],
-      initiate:['첼시 씨! 오늘 정말 기분이 좋아요, 같이 있어요!','헤헤, 오늘은 왠지 다 잘 될 것 같아요!'],
-      poked:['꺄, 아파요! 그래도 기분은 좋아요 헤헤','아야, 놀랐잖아요~'],
-      reactToChelsea:['어멋, 오늘따라 다정하시네요!','네? 저요? 기뻐요!']
+      idle:["오늘따라 기분이 좋습니다.","무얼 하면 좋을까요?"],
+      initiate:["오늘은 날이 좋네요. 같이 있어요, 형제님.","모든 게 잘 풀릴 것 같지 않나요?","오늘은 같이 차 한 잔 하실래요?"],
+      poked:["하실 말씀이 있으신가요?","아야, 놀랐어요."],
+      reactToChelsea:["오늘따라 다정하시네요.","기쁜걸요."]
     },
     bad:{
-      idle:['...오늘은 조금 기운이 없네요.','괜히 마음이 가라앉아요.'],
-      initiate:['첼시 씨... 잠깐 옆에 있어주면 안 될까요?','오늘은 좀 위로가 필요해요...'],
-      poked:['...아파요.','오늘은 그냥 조용히 있고 싶었는데...'],
-      reactToChelsea:['...정말요? 신경 써주는 거예요?','고마워요... 첼시 씨.']
+      idle:["... 오늘은 조금 기운이 없군요.","괜히 마음이 가라앉아요."],
+      initiate:["잠깐 옆에 있어주시면 안 될까요?","위로가 필요해요.","잠시 곁에 앉아도 될까요?","아무 말 안 하셔도 괜찮아요. 그냥 옆에 있고 싶어요."],
+      poked:["... 아파요.","오늘은 조용히 있고 싶었는데..."],
+      reactToChelsea:["... 신경 써주시는 거예요?","예, 알겠습니다..."]
     },
     tired:{
-      idle:['하암... 졸려요.','오늘따라 몸이 무겁네요.'],
-      initiate:['첼시 씨... 잠깐만 기대도 될까요...?','졸린데 그냥 옆에 있고 싶어요...'],
-      poked:['으음... 아, 아파요...','졸려서 잘 못 느꼈어요...'],
-      reactToChelsea:['어...? 첼시 씨...? 저 지금 졸린데...','고마워요... 하암...']
+      idle:["하암...","오늘따라 몸이 무거워요."],
+      initiate:["안녕히 주무세요...","피로한 날이에요. 그렇지 않나요?","눈이 자꾸 감겨서... 옆에서 잠깐 쉴게요.","피곤한 날엔 같이 쉬는 게 좋지 않을까요?"],
+      poked:["으음... 아, 아파요...","네? 부르셨나요?"],
+      reactToChelsea:["다시 말씀해주세요...","고마워요... 하암..."]
     },
     angry:{
-      idle:['...오늘은 저도 화가 나 있어요.','흥, 오늘은 그냥 내버려두세요.'],
-      initiate:['첼시 씨, 그래도 저 신경 좀 써줘요!','오늘은 저도 삐졌다구요!'],
-      poked:['아! 아파요, 진짜!','오늘은 좀 살살 해주세요!'],
-      reactToChelsea:['흥, 그래도 좀 봐드릴게요.','...먼저 말 걸어줘서 다행이에요.']
+      idle:["... 아무 일 없습니다.","혼자 있고 싶어요."],
+      initiate:["지나갈게요.","저라고 마냥... ... 아닙니다.","첼시 씨, 잠깐 얘기 좀 해요.","제 얘기도 좀 들어주세요."],
+      poked:["아파요!","너무해!"],
+      reactToChelsea:["... 예.","알겠습니다."]
     }
   };
   const chelseaDialogue = {
     good:{
-      idle:['오늘은 뭐, 나쁘지 않네.','...기분이 좀 괜찮은 날이네.'],
-      initiate:['야... 오늘은 그냥 말 걸어본 거야, 착각하지 마.','뭐, 심심하면 옆에 있든가.'],
-      poked:['야, 뭐야... 오늘은 봐준다.','아 뭐야, 놀랐잖아.'],
-      reactToEdith:['...오늘따라 안 귀찮네.','흥, 오늘만 특별히 받아준다.']
+      idle:["나쁘지 않군.","..."],
+      initiate:["(툭툭 건드린다.)"],
+      poked:["뭐야?","아 뭐야, 놀랐잖아."],
+      reactToEdith:["뭔데. 똑바로 말해라.","시끄러."]
     },
     bad:{
-      idle:['하... 오늘 진짜 별로다.','아무것도 하기 싫다.'],
-      initiate:['저리 가라고 몇 번을 말해...','오늘은 말 걸지 마라...'],
-      poked:['건들지 마, 오늘 기분 별로야.','아 진짜, 하필 오늘...'],
-      reactToEdith:['하... 진짜 오늘따라 더 귀찮다.','저리 가, 오늘은 정말 별로야.']
+      idle:["하... 오늘 진짜 별로다.","아무것도 하기 싫다."],
+      initiate:[],
+      poked:["건들지 마, 오늘 기분 별로야.","아 진짜, 하필 오늘..."],
+      reactToEdith:["바쁘다. 말 걸지 마라.","왜 자꾸 귀찮게 구는데?"]
     },
     tired:{
-      idle:['졸려... 그냥 자고 싶다.','아 피곤해 죽겠네.'],
-      initiate:['...너무 피곤해서 그냥 온 거야, 오해하지 마.','졸린데 왜 자꾸 눈에 밟히냐...'],
-      poked:['아... 귀찮아, 졸려 죽겠는데.','건들지 마... 피곤해.'],
-      reactToEdith:['하암... 피곤한데 왜 자꾸 와.','...조용히 좀 있자, 피곤하니까.']
+      idle:["(하품한다.)","피곤해 죽겠다."],
+      initiate:[],
+      poked:["아... 귀찮아, 졸려 죽겠는데.","건들지 마... 피곤해."],
+      reactToEdith:["하암... 피곤한데 왜 자꾸 와.","...조용히 좀 있자, 피곤하니까."]
     },
     angry:{
-      idle:['다 짜증나.','오늘은 건들면 큰일 난다.'],
-      initiate:['야! 뭐 하나만 물어보자, 딱 그거만이야!','오늘 진짜 다 귀찮으니까 짧게 하자.'],
-      poked:['뭐 하는 거야!! 진짜 화났다고!','건들지 말라고 몇 번을 말해!!'],
-      reactToEdith:['저리 안 가?! 오늘 진짜 화났다고!','귀찮게 하지 말라고!! 진짜 짜증나!']
+      idle:["다 짜증나.","오늘은 건들면 큰일 난다."],
+      initiate:[],
+      poked:["뭐 하는 거야!! 진짜 화났다고!","건들지 말라고 몇 번을 말해!!"],
+      reactToEdith:["저리 안 가?! 오늘 진짜 화났다고!","귀찮게 하지 말라고!! 진짜 짜증나!"]
     }
   };
 
@@ -2546,7 +2546,25 @@
     }
   }
   el.charA.addEventListener('click', ()=> poke('A'));
-  el.charB.addEventListener('click', ()=> poke('B'));
+  // 첼시를 연속으로 5번 클릭하면 이디스가 첼시 앞으로 나와서 말린다
+  const edithStopLines = ['하지마세요!'];
+  let pokeBCount = 0, pokeBLast = 0;
+  function edithStopsPoking(){
+    if(interacting) return;
+    interacting = true;
+    const side = positions.B > 40 ? -1 : 1;
+    walkTo('A', positions.B + side*10);
+    el.charA.style.zIndex = 30;
+    setTimeout(()=> say('A', pick(edithStopLines)), 900);
+    setTimeout(()=>{ el.charA.style.zIndex = ''; interacting = false; }, 3000);
+  }
+  el.charB.addEventListener('click', ()=>{
+    poke('B');
+    const now = Date.now();
+    pokeBCount = (now - pokeBLast < 1500) ? pokeBCount + 1 : 1;
+    pokeBLast = now;
+    if(pokeBCount >= 5){ pokeBCount = 0; edithStopsPoking(); }
+  });
 
   let positions = { A:14, B:56 };
   function scheduleWalk(who){
@@ -2571,7 +2589,7 @@
     interacting=true;
     let edithChance = 0.8;
     if(state.charA.mood!=='good') edithChance = 0.35;
-    const edithInitiates = Math.random() < edithChance;
+    const edithInitiates = Math.random() < edithChance || poolOf('B').initiate.length===0;
     const meetSpot = 26 + Math.random()*20;
     walkTo('A', edithInitiates? meetSpot : meetSpot+12);
     walkTo('B', edithInitiates? meetSpot+12 : meetSpot);
@@ -2588,12 +2606,12 @@
 
   // 첼시가 이디스를 때리는 이벤트 (첼시 기분나쁨/화남 상태에서만 발생)
   const chelseaHitLines = {
-    bad: ['아 진짜 짜증나게 하지 마.', '건들지 좀 마, 오늘 진짜 별로야.', '저리 안 가? 하...'],
-    angry: ['비켜!! 진짜 열받는다고!!', '건들지 말라고 몇 번을 말해!!', '저리 안 꺼져?!']
+    bad: ["짜증나게 하지 마.","건들지 마라.","저리 안 꺼져? 하..."],
+    angry: ["비켜!!","건들지 말라고 몇 번을 말해!!","저리 안 꺼져?!"]
   };
   const edithHitLines = {
-    bad: ['아야! 아파요...', '아... 왜 이러세요...'],
-    angry: ['아야!! 아파요, 진짜!!', '아! 뭐하시는 거예요!!']
+    bad: ["아야! 아파요...","제가 무언가 잘못했나요?"],
+    angry: ["아야!!","말로 해주세요!"]
   };
   function chelseaHitEdith(){
     if(interacting) return;
@@ -2812,12 +2830,12 @@
       key: 'sofa',
       spotA: 10, spotB: 20,
       linesA: ['같이 앉아서 좀 쉬어요.', '여기 자리 넉넉해요, 앉으세요.'],
-      linesB: ['…뭐 잠깐만 앉는다.', '앉는 김에 딴짓 좀 할게.']
+      linesB: ['싫은데?', '비켜.']
     },
     {
       key: 'window',
       spotA: 78, spotB: 88,
-      linesA: ['날씨가 참 좋네요.', '창밖 풍경이 예쁘네요.'],
+      linesA: ['날씨가 참 좋아요.', '창밖 풍경이 예쁘네요.'],
       linesB: ['…그냥 밖 좀 본 거야.', '딱히 볼 것도 없네.']
     }
   ];
